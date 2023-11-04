@@ -3,7 +3,6 @@ from torch import nn
 from nn_builder.toolkit.utils import (
     HyperParameters,
     ProgressBoard,
-    cpu,
 )
 
 class Module(nn.Module, HyperParameters):
@@ -11,7 +10,7 @@ class Module(nn.Module, HyperParameters):
 
     def __init__(self, plot_train_per_epoch = 2, plot_valid_per_epoch  = 1) -> None:
         super().__init__()
-        self.save_hyperparameters
+        self.save_hyperparameters()
         self.board = ProgressBoard()
 
     def loss(self, y_hat, y):
@@ -33,7 +32,7 @@ class Module(nn.Module, HyperParameters):
             x = self.trainer.epoch + 1
             n = self.trainer.num_val_batches / self.plot_valid_per_epoch
 
-        self.board.draw(x, value.to(cpu()).detach().numpy(),
+        self.board.draw(x, value.to('cpu').detach().numpy(),
                         ('train_' if train else 'val_') + key,
                         every_n=int(n))
 

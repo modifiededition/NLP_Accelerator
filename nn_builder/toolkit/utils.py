@@ -3,6 +3,8 @@ import collections
 from IPython import display
 from matplotlib_inline import backend_inline
 import matplotlib.pyplot as plt
+import torch
+
 
 
 def add_to_class(Class):
@@ -16,10 +18,6 @@ def add_to_class(Class):
 
 class HyperParameters:
     """The base class of hyperparameters."""
-    def save_hyperparameters(self, ignore=[]):
-        """Defined in :numref:`sec_oo-design`"""
-        raise NotImplemented
-
     def save_hyperparameters(self, ignore=[]):
         """Save function arguments into class attributes.
 

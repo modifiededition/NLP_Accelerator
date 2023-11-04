@@ -1,10 +1,12 @@
+import torch
+
 from nn_builder.toolkit.utils import (
     HyperParameters,
 )
 
 class Trainer(HyperParameters):
 
-    def __init__(self, max_epohs, num_gpus = 0, gradient_clip_val  = 0) -> None:
+    def __init__(self, max_epochs, num_gpus = 0, gradient_clip_val  = 0) -> None:
         self.save_hyperparameters()
         assert num_gpus == 0
 
@@ -20,6 +22,8 @@ class Trainer(HyperParameters):
         model.board.xlim = [0, self.max_epochs]
         self.model = model
 
+    def prepare_batch(self, batch):
+        return batch
 
     def fit(self, model, data):
         self.prepare_data(data)
@@ -33,5 +37,25 @@ class Trainer(HyperParameters):
             self.fit_epoch()
 
     def fit_epoch(self):
-        raise NotImplementedError
+        self.model.train()
+        for batch in self.train_dataloader:
+            loss = self.model.training_step(self.prepare_batch(batch))
+            self.optim.zero_grad()
+            with torch.no_grad():
+                loss.backward()
+                if self.gradient_clip_val > 0:
+                    self.clip_gradients(self.gradient_clip_value, self.model)
+                self.optim.step()
+            self.train_batch_idx +=1
+
+        if self.val_dataloader is None:
+            return
+        self.model.eval()
+
+        for batch in self.val_dataloader:
+            with torch.no_grad():
+                self.model.validation_step(self.prepare_batch(batch))
+            self.val_batch_idx +=1
+
+
 
