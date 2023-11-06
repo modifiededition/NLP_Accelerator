@@ -5,7 +5,7 @@ from nn_builder.toolkit.models_base import Module
 
 class LinearRegression(Module):
 
-    def __init__(self) -> None:
+    def __init__(self, lr) -> None:
         super().__init__()
         self.save_hyperparameters()
         self.net = torch.nn.LazyLinear(1)
