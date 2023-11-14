@@ -11,10 +11,8 @@ class MLPScratch(Classifier):
 
         self.W1 = nn.Parameter(torch.randn(num_inputs, num_hiddens)*sigma)
         self.b1 = nn.Parameter(torch.zeros(num_hiddens))
-
         self.W2 = nn.Parameter(torch.randn(num_hiddens, num_outputs)*sigma)
         self.b2 = nn.Parameter(torch.zeros(num_outputs))
-
 
     def forward(self,X):
         X = X.reshape(-1, self.num_inputs)
