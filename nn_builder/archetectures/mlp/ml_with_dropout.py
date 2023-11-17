@@ -1,6 +1,6 @@
 import torch
 from torch import nn
-from nn_builder.toolkit.classification_base import Classifier
+from nn_builder.toolkit import Classifier
 from torch.nn import functional as F
 
 def dropout_layer(X, dropout):

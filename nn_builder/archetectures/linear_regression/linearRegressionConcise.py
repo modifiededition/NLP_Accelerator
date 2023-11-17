@@ -1,6 +1,6 @@
 import torch
 
-from nn_builder.toolkit.models_base import Module
+from nn_builder.toolkit import Module
 
 
 class LinearRegression(Module):

@@ -1,4 +1,4 @@
-from nn_builder.toolkit.classification_base import Classifier
+from nn_builder.toolkit import Classifier
 from torch import nn
 from torch.nn import functional as F
 

@@ -1,8 +1,8 @@
-from nn_builder.toolkit.data_base import DataModule
+from nn_builder.toolkit import DataModule
 import torchvision
 from torchvision import transforms
 import torch
-from nn_builder.toolkit.utils import show_images
+from nn_builder.utils import show_images
 
 class FashionMNIST(DataModule):
 

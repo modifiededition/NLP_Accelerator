@@ -1,5 +1,5 @@
 import torch
-from nn_builder.toolkit.models_base import Module
+from nn_builder.toolkit import Module
 from nn_builder.optimizers.sgd import SGD
 
 class LinearRegressionScratch(Module):

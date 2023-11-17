@@ -1,6 +1,6 @@
 from typing import Iterator
 import torch
-from nn_builder.toolkit.classification_base import Classifier
+from nn_builder.toolkit import Classifier
 from torch.nn.parameter import Parameter
 
 
