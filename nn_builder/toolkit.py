@@ -84,6 +84,7 @@ class Trainer(HyperParameters):
         self.save_hyperparameters()
         self.gpus = [gpu(i) for i in range(min(num_gpus, get_num_gpus()))]
 
+
     def prepare_data(self, data):
         self.train_dataloader = data.train_dataloader()
         self.val_dataloader = data.val_dataloader()
@@ -95,12 +96,12 @@ class Trainer(HyperParameters):
         model.trainer = self
         model.board.xlim = [0, self.max_epochs]
 
-        if self.gpus:
+        if len(self.gpus) > 0:
             model.to(self.gpus[0])
         self.model = model
 
     def prepare_batch(self, batch):
-        if self.gpus:
+        if len(self.gpus) > 0:
             batch = [a.to(self.gpus[0]) for a in batch]
         return batch
 
@@ -123,7 +124,7 @@ class Trainer(HyperParameters):
             with torch.no_grad():
                 loss.backward()
                 if self.gradient_clip_val > 0:
-                    self.clip_gradients(self.gradient_clip_value, self.model)
+                    self.clip_gradients(self.gradient_clip_val, self.model)
                 self.optim.step()
             self.train_batch_idx +=1
 
@@ -135,6 +136,14 @@ class Trainer(HyperParameters):
             with torch.no_grad():
                 self.model.validation_step(self.prepare_batch(batch))
             self.val_batch_idx +=1
+
+    def clip_gradients(self, grad_clip_val, model):
+        params = [p for p in model.parameters() if p.requires_grad]
+        norm = torch.sqrt(sum(torch.sum((p.grad ** 2)) for p in params))
+        if norm > grad_clip_val:
+            for param in params:
+                param.grad[:] *= grad_clip_val / norm
+
 
 
 ################# Classification Class #####################################################

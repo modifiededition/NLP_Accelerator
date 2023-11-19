@@ -49,7 +49,7 @@ class TimeMachine(DataModule):
     def __init__(self, batch_size, num_steps, num_train=10000, num_val = 5000):
         super().__init__()
         self.save_hyperparameters()
-        corpus, self.voab = self.build(self._download())
+        corpus, self.vocab = self.build(self._download())
         array = torch.tensor([corpus[i:i+num_steps+1] for i in range(len(corpus)-num_steps)])
         self.X,self.Y = array[:,:-1], array[:,1:]
 
