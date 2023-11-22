@@ -1,6 +1,5 @@
 import torch
 from torch import nn
-
 from nn_builder.toolkit import Module
 
 class LSTMScratch(Module):
