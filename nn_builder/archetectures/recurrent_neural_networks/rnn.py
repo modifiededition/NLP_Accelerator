@@ -104,9 +104,40 @@ class RNNLM(RNNLMScratch):  #@save
         return self.linear(hiddens).swapaxes(0, 1)
 
 
+class StackedRNNScratch(Module):
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.rnns = nn.Sequential(*[RNNScratch(
+            num_inputs if i==0 else num_hiddens, num_hiddens, sigma)for i in range(num_layers)])
+
+    def forward(self, inputs, Hs=None):
+        outputs = inputs
+        if Hs is None:
+            Hs = [None] * self.num_layers
+
+        for i in range(self.num_layers):
+            outputs, Hs[i] = self.rnns[i](outputs, Hs[i])
+            outputs = torch.stack(outputs, 0)
+
+        return outputs, Hs
 
 
+class BiRNNScratch(Module):
+    def __init__(self, num_inputs, num_hiddens, sigma=0.01):
+        super().__init__()
+        self.save_hyperparameters()
+        self.f_rnn = RNNScratch(num_inputs, num_hiddens, sigma)
+        self.b_rnn = RNNScratch(num_inputs, num_hiddens, sigma)
+        self.num_hiddens *= 2  # The output dimension will be doubled
 
+    def forward(self, inputs, Hs=None):
+        f_H, b_H = Hs if Hs is not None else (None, None)
+        f_outputs, f_H = self.f_rnn(inputs, f_H)
+        b_outputs, b_H = self.b_rnn(reversed(inputs), b_H)
+        outputs = [torch.cat((f, b), -1) for f, b in zip(
+            f_outputs, reversed(b_outputs))]
+        return outputs, (f_H, b_H)
 
 
 
