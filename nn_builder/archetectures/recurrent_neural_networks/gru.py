@@ -34,10 +34,10 @@ class GRUScratch(Module):
 
 
 class GRU(Module):
-    def __init__(self, num_inputs, num_hiddens,sigma=0.01):
+    def __init__(self, num_inputs, num_hiddens, num_layers, sigma=0.01):
         super().__init__()
         self.save_hyperparameters()
-        self.rnn = nn.GRU(num_inputs, num_hiddens)
+        self.rnn = nn.GRU(num_inputs, num_hiddens,num_layers)
 
     def forward(self, inputs, H=None):
         return self.rnn(inputs, H)
