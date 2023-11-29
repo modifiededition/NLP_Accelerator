@@ -11,6 +11,8 @@ import hashlib
 import zipfile
 import tarfile
 
+from torch import nn
+
 
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
@@ -202,5 +204,50 @@ def extract(filename, folder=None):
     if folder is None:
         folder = base_dir
     fp.extractall(folder)
+
+def show_heatmaps(matrices, xlabel, ylabel, titles = None, figsize = (2.5,2.5), cmap='Reds'):
+
+    """Show heat map of matrices"""
+
+    # matrices shape: num_of_rows, num_of_cols, num_queries, num_keys
+    num_rows, num_cols,_,_ = matrices.shape
+    fig, axes = plt.subplots(num_rows, num_cols, figsize = figsize, sharex=True, sharey=True, squeeze=False)
+    for i, (row_axes, row_matrices) in enumerate(zip(axes, matrices)):
+
+        for j, (ax, matrix) in enumerate(zip(row_axes, row_matrices)):
+            pcm = ax.imshow(matrix.detach().numpy(), cmap=cmap)
+            if i == num_rows - 1:
+                ax.set_xlabel(xlabel)
+            if j == 0:
+                ax.set_ylabel(ylabel)
+            if titles:
+                ax.set_title(titles[j])
+    fig.colorbar(pcm, ax=axes, shrink=0.6);
+
+
+
+
+def _sequence_mask(X, valid_length, value = 0):
+    maxlen = X.size(1)
+    a =  torch.arange((maxlen), dtype=torch.float32,device=X.device)[None, :]
+    mask = a < valid_length[:, None]
+    X[~mask] = value
+    return X
+
+def masked_softmax(X, valid_length):
+
+    if valid_length is None:
+        return nn.functional.softmax(X, dim = -1)
+
+    else:
+        shape = X.shape
+        if valid_length.dim() == 1:
+            valid_length = torch.repeat_interleave(valid_length, shape[1])
+
+        else:
+            valid_length = valid_length.reshape(-1)
+
+        X = _sequence_mask(X.reshape(-1, shape[-1]), valid_length, value=-1e6)
+        return nn.functional.softmax(X.reshape(shape), dim=-1)
 
 
