@@ -75,7 +75,6 @@ class Seq2Seq(Module):
     def forward(self, enc_x, dec_x, *args):
         enc_all_outputs = self.encoder(enc_x, *args)
         dec_state = self.decoder.init_state(enc_all_outputs, *args)
-
         return self.decoder(dec_x, dec_state)[0]
 
     def loss(self, y_hat, y):
